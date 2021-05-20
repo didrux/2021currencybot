@@ -6,7 +6,13 @@ token = "1310155222:AAGRUfmrIomT9gPJgRCuto_5IYLCI1PhgOg"
 bot = telebot.TeleBot(token)
 
 #change commenSregbFek
+#sad
 
+
+#sdfsdf
+
+#sdf
+#sdf
 response = requests.get('https://minfin.com.ua/api/currency/ratelist/?currency1=usd&currency2=uah&converter_type=midbank')
 json_data = json.loads(response.text)
 usd_a = json_data['data']['rates']['buy']['USD']
