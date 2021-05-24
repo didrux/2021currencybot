@@ -2,10 +2,12 @@ import telebot
 from telebot import types
 import json
 import requests
+
 token = "1310155222:AAGRUfmrIomT9gPJgRCuto_5IYLCI1PhgOg"
 bot = telebot.TeleBot(token)
 
-response = requests.get('https://minfin.com.ua/api/currency/ratelist/?currency1=usd&currency2=uah&converter_type=midbank')
+response = requests.get(
+    'https://minfin.com.ua/api/currency/ratelist/?currency1=usd&currency2=uah&converter_type=midbank')
 json_data = json.loads(response.text)
 usd_a = json_data['data']['rates']['buy']['USD']
 usd_a = float(usd_a)
@@ -16,15 +18,18 @@ gbp_a = float(gbp_a)
 rub_a = json_data['data']['rates']['buy']['RUB']
 rub_a = float(rub_a)
 
-
-
-
+USD_txt = 'USD'
+GBP_txt = 'GBP'
+UAH_txt = 'UAH🇺🇦'
+RUB_txt = 'RUB🇷🇺'
+EUR_txt = 'EUR🇪🇺'
 
 joinedFile = open("db.txt", "r")
-joinedUsers = set ()
+joinedUsers = set()
 for line in joinedFile:
     joinedUsers.add(line.strip())
 joinedFile.close()
+
 
 @bot.message_handler(commands=['start'])
 def startJoin(message):
@@ -41,16 +46,17 @@ def startJoin(message):
     if message.text == "/start":
         bot.send_message(message.from_user.id, "Сhoose the currency you want to convert to", reply_markup=keyboard())
 
+
 @bot.message_handler(commands=['dbsend'])
 def mess1(message):
     f = open("db.txt", "rb")
     bot.send_document(message.from_user.id, data=f)
 
+
 @bot.message_handler(commands=['special'])
 def mess2(message):
     for user in joinedUsers:
         bot.send_message(user, message.text[message.text.find(' '):])
-
 
 
 def keyboard():
@@ -61,6 +67,8 @@ def keyboard():
     btn4 = types.KeyboardButton('RUB🇷🇺')
     markup.add(btn1, btn2, btn3, btn4)
     return markup
+
+
 def kb_usd():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=False, resize_keyboard=True, row_width=2)
     usd_btn1 = types.KeyboardButton('usd -> UAH🇺🇦')
@@ -69,6 +77,7 @@ def kb_usd():
     usd_btn4 = types.KeyboardButton('usd -> RUB🇷🇺')
     markup.add(usd_btn1, usd_btn2, usd_btn3, usd_btn4)
     return markup
+
 
 def kb_eur():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=False, resize_keyboard=True, row_width=2)
@@ -79,6 +88,7 @@ def kb_eur():
     markup.add(eur_btn1, eur_btn2, eur_btn3, eur_btn4)
     return markup
 
+
 def kb_gbp():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=False, resize_keyboard=True, row_width=2)
     gbp_btn1 = types.KeyboardButton('gbp -> UAH🇺🇦')
@@ -87,6 +97,7 @@ def kb_gbp():
     gbp_btn4 = types.KeyboardButton('gbp -> RUB🇷🇺')
     markup.add(gbp_btn1, gbp_btn2, gbp_btn3, gbp_btn4)
     return markup
+
 
 def kb_rub():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=False, resize_keyboard=True, row_width=2)
@@ -99,18 +110,20 @@ def kb_rub():
 
 
 @bot.message_handler(content_types=['text'])
-def anymsg(message):
-    #first step
-    if message.text == 'USD🇺🇸':
-        bot.send_message(message.from_user.id, "Choose the currency you want to convert USD to, than enter needed value", reply_markup=kb_usd())
-    if message.text == 'EUR🇪🇺':
-        bot.send_message(message.from_user.id, "Choose the currency you want to convert EUR to, than enter needed value", reply_markup=kb_eur())
-    if message.text == 'GBP🇬🇧':
-        bot.send_message(message.from_user.id, "Choose the currency you want to convert GBP to, than enter needed value", reply_markup=kb_gbp())
-    if message.text == 'RUB🇷🇺':
-        bot.send_message(message.from_user.id, "Choose the currency you want to convert RUB to, than enter needed value", reply_markup=kb_rub())
 
-    #second step(usd to)
+def checker(message):
+    if message.text == message:
+        bot.send_message(message.from_user.id, "Choose the currency you want to convert" + message + "to, than enter needed value", reply_markup=kb_usd())
+
+checker(USD_txt)
+checker(EUR_txt)
+checker(GBP_txt)
+checker(RUB_txt)
+
+
+def anymsg(message):
+
+    # second step(usd to)
     if message.text == 'usd -> UAH🇺🇦':
         bot.register_next_step_handler(message, usd_uah)
     if message.text == 'usd -> EUR🇪🇺':
@@ -120,11 +133,9 @@ def anymsg(message):
     if message.text == 'usd -> RUB🇷🇺':
         bot.register_next_step_handler(message, usd_rub)
 
+
 def checker(message):
-    
-
-
-    #second step(eur to)
+    # second step(eur to)
     if message.text == 'eur -> UAH🇺🇦':
         bot.register_next_step_handler(message, eur_uah)
     if message.text == 'eur -> USD🇺🇸':
@@ -134,7 +145,7 @@ def checker(message):
     if message.text == 'eur -> RUB🇷🇺':
         bot.register_next_step_handler(message, eur_rub)
 
-    #second step(gbp to)
+    # second step(gbp to)
     if message.text == 'gbp -> UAH🇺🇦':
         bot.register_next_step_handler(message, gbp_uah)
     if message.text == 'gbp -> USD🇺🇸':
@@ -144,8 +155,7 @@ def checker(message):
     if message.text == 'gbp -> RUB🇷🇺':
         bot.register_next_step_handler(message, gbp_rub)
 
-
-    #second step(rub to)
+    # second step(rub to)
     if message.text == 'rub -> UAH🇺🇦':
         bot.register_next_step_handler(message, rub_uah)
     if message.text == 'rub -> USD🇺🇸':
@@ -156,60 +166,69 @@ def checker(message):
         bot.register_next_step_handler(message, rub_gbp)
 
 
-
-#USD
+# USD
 def usd_uah(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*usd_a}'
+        texto1 = f'{message.text * usd_a}'
         texto1 = float(texto1)
         usd_txt = round(texto1, 2)
         bot.reply_to(message, usd_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def usd_eur(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*usd_a/eur_a}'
+        texto1 = f'{message.text * usd_a / eur_a}'
         texto1 = float(texto1)
         eur_txt = round(texto1, 2)
         bot.reply_to(message, eur_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def usd_gbp(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*usd_a/gbp_a}'
+        texto1 = f'{message.text * usd_a / gbp_a}'
         texto1 = float(texto1)
         gbp_txt = round(texto1, 2)
         bot.reply_to(message, gbp_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def usd_rub(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*usd_a/rub_a}'
+        texto1 = f'{message.text * usd_a / rub_a}'
         texto1 = float(texto1)
         rub_txt = round(texto1, 2)
         bot.reply_to(message, rub_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
-#EURO
+
+
+# EURO
 def eur_uah(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*eur_a}'
+        texto1 = f'{message.text * eur_a}'
         texto1 = float(texto1)
         eur_txt = round(texto1, 2)
         bot.reply_to(message, eur_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
@@ -217,11 +236,12 @@ def eur_uah(message):
 def eur_usd(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*eur_a/usd_a}'
+        texto1 = f'{message.text * eur_a / usd_a}'
         texto1 = float(texto1)
         eur_txt = round(texto1, 2)
         bot.reply_to(message, eur_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
@@ -229,34 +249,39 @@ def eur_usd(message):
 def eur_gbp(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*eur_a/gbp_a}'
+        texto1 = f'{message.text * eur_a / gbp_a}'
         texto1 = float(texto1)
         eur_txt = round(texto1, 2)
         bot.reply_to(message, eur_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def eur_rub(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*eur_a/rub_a}'
+        texto1 = f'{message.text * eur_a / rub_a}'
         texto1 = float(texto1)
         eur_txt = round(texto1, 2)
         bot.reply_to(message, eur_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
-#BRITAIN
+
+# BRITAIN
 def gbp_uah(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*gbp_a}'
+        texto1 = f'{message.text * gbp_a}'
         texto1 = float(texto1)
         gbp_txt = round(texto1, 2)
         bot.reply_to(message, gbp_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
@@ -264,11 +289,12 @@ def gbp_uah(message):
 def gbp_usd(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*gbp_a/usd_a}'
+        texto1 = f'{message.text * gbp_a / usd_a}'
         texto1 = float(texto1)
         gbp_txt = round(texto1, 2)
         bot.reply_to(message, gbp_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
@@ -276,71 +302,80 @@ def gbp_usd(message):
 def gbp_eur(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*gbp_a/eur_a}'
+        texto1 = f'{message.text * gbp_a / eur_a}'
         texto1 = float(texto1)
         gbp_txt = round(texto1, 2)
         bot.reply_to(message, gbp_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def gbp_rub(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*gbp_a/rub_a}'
+        texto1 = f'{message.text * gbp_a / rub_a}'
         texto1 = float(texto1)
         gbp_txt = round(texto1, 2)
         bot.reply_to(message, gbp_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
 
-#RUB
+
+# RUB
 def rub_uah(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*rub_a}'
+        texto1 = f'{message.text * rub_a}'
         texto1 = float(texto1)
         rub_txt = round(texto1, 2)
         bot.reply_to(message, rub_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def rub_usd(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*rub_a/usd_a}'
+        texto1 = f'{message.text * rub_a / usd_a}'
         texto1 = float(texto1)
         rub_txt = round(texto1, 2)
         bot.reply_to(message, rub_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def rub_eur(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*rub_a/eur_a}'
+        texto1 = f'{message.text * rub_a / eur_a}'
         texto1 = float(texto1)
         rub_txt = round(texto1, 2)
         bot.reply_to(message, rub_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
+
 
 def rub_gbp(message):
     try:
         message.text = float(message.text)
-        texto1 = f'{message.text*rub_a/gbp_a}'
+        texto1 = f'{message.text * rub_a / gbp_a}'
         texto1 = float(texto1)
         rub_txt = round(texto1, 2)
         bot.reply_to(message, rub_txt)
-        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to", reply_markup=keyboard())
+        bot.send_message(message.from_user.id, "Return to homepage...Сhoose the currency you want to convert to",
+                         reply_markup=keyboard())
     except ValueError:
         bot.reply_to(message, "Enter only numbers. Press needed and enter value again")
-
-
 
 
 if __name__ == '__main__':
