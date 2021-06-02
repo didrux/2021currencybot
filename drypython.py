@@ -8,7 +8,7 @@ if a == 'gbp':
 
 def checker(a):
     if a == a:
-        print("You wrote " + a + " value")
+        print("You wrote " + a + "  value")
 
 checker(a)
 
